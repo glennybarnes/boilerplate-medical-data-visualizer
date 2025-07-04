@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # 1
-df = None
-
+df = pd.read_csv('/workspace/boilerplate-medical-data-visualizer/medical_examination.csv')
+df.head()
 # 2
 df['overweight'] = None
 
