@@ -5,26 +5,42 @@ import numpy as np
 
 # 1
 df = pd.read_csv('/workspace/boilerplate-medical-data-visualizer/medical_examination.csv')
-df.head()
+
+
 # 2
-df['overweight'] = None
+df['overweight'] = (df['weight'] / ((df['height'] / 100) ** 2) > 25).astype(int)
 
 # 3
-
+# Normalize data by making 0 good and 1 bad for cholesterol and gluc
+df['cholesterol'] = (df['cholesterol'] > 1).astype(int)
+df['gluc'] = (df['gluc'] > 1).astype(int)
 
 # 4
 def draw_cat_plot():
     # 5
-    df_cat = None
+    df_cat = pd.melt(
+        df,
+        id_vars='cardio',
+        value_vars=['active', 'alco', 'cholesterol', 'gluc', 'overweight', 'smoke']
 
-
+    )
     # 6
-    df_cat = None
+    df_cat = df_cat.groupby(['cardio', 'variable', 'value']).size().reset_index(name='total')
+
     
 
     # 7
 
+    fig = sns.catplot(
+        x='variable',
+        y='total',
+        hue='value',
+        col='cardio',
+        data=df_cat,
+        kind='bar'
+    ).fig
 
+    return fig
 
     # 8
     fig = None
@@ -35,23 +51,40 @@ def draw_cat_plot():
     return fig
 
 
-# 10
+# 10 Draw Heat Map
 def draw_heat_map():
     # 11
-    df_heat = None
+    df_heat = df[
+        (df['ap_lo'] <= df['ap_hi']) &
+        (df['height'] >= df['height'].quantile(0.025)) &
+        (df['height'] <= df['height'].quantile(0.975)) &
+        (df['weight'] >= df['weight'].quantile(0.025)) &
+        (df['weight'] <= df['weight'].quantile(0.975))
+    ]
 
-    # 12
-    corr = None
+    # 12 Calculate the correlation matirx
+    corr = df_heat.corr()
 
-    # 13
-    mask = None
+    # 13 Generate a mask for the upper triangle
+    mask = np.triu(np.ones_like(corr, dtype=bool))
 
 
 
-    # 14
-    fig, ax = None
+    # 14 Set the matplotlib figure
+    fig, ax = plt.subplots(figsize=(12, 10))
 
     # 15
+    # Draw the heatmap
+    sns.heatmap(
+        corr,
+        mask=mask,
+        annot=True,
+        fmt=".1f",
+        center=0,
+        square=True,
+        linewidths=.5,
+        cbar_kws={"shrink": .5}
+    )
 
 
 
